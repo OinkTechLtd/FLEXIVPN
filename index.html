@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexiVPN — Бесплатный VPN для браузера</title>
+<meta name="description" content="FlexiVPN — бесплатное расширение для Chrome с серверами по всему миру. Обход блокировок, защита приватности, Premium за активность.">
+<meta property="og:title" content="FlexiVPN — Бесплатный VPN для браузера">
+<meta property="og:description" content="Бесплатный VPN с обходом блокировок РФ. Серверы в 10+ странах. Premium за 14 дней активности.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #070B15;
+  --bg2: #0E1525;
+  --bg3: #141C2E;
+  --border: rgba(255,255,255,0.07);
+  --accent: #00D9A3;
+  --accent2: #7B5FFF;
+  --danger: #FF4D6D;
+  --text: #F0F4FF;
+  --muted: #6B7FA3;
+  --r: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── Background Effects ── */
+.bg-mesh {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 800px 600px at 15% 20%, rgba(0,217,163,0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 700px 700px at 85% 70%, rgba(123,95,255,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 500px 400px at 50% 90%, rgba(0,217,163,0.04) 0%, transparent 60%);
+}
+
+.grid-overlay {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.04;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ── Nav ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(7,11,21,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+.nav-inner {
+  max-width: 1160px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: var(--text);
+}
+.nav-logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.nav-logo-text { font-weight: 800; font-size: 18px; }
+.nav-logo-text span { color: var(--accent); }
+
+.nav-links {
+  display: flex; align-items: center; gap: 28px;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--muted); text-decoration: none;
+  font-size: 14px; font-weight: 500;
+  transition: color .15s;
+}
+.nav-links a:hover { color: var(--text); }
+
+.btn-nav {
+  background: var(--accent); color: #000;
+  font-weight: 700; font-size: 13px;
+  padding: 9px 18px; border-radius: 10px;
+  text-decoration: none; transition: all .2s;
+  white-space: nowrap;
+}
+.btn-nav:hover { background: #00f5bc; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,217,163,0.25); }
+
+/* ── Hero ── */
+.hero {
+  position: relative; z-index: 1;
+  padding: 100px 24px 80px;
+  text-align: center;
+  max-width: 900px; margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,217,163,0.1);
+  border: 1px solid rgba(0,217,163,0.2);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px; font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 24px;
+  letter-spacing: 0.3px;
+}
+
+.hero h1 {
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+.hero h1 .grad {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 18px; color: var(--muted);
+  max-width: 560px; margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 60px;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #000;
+  font-weight: 800; font-size: 15px;
+  padding: 15px 28px; border-radius: 14px;
+  text-decoration: none; cursor: pointer;
+  border: none; transition: all .25s;
+  position: relative; overflow: hidden;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.btn-primary:hover::before { opacity: 1; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,217,163,0.35); }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg2); color: var(--text);
+  font-weight: 600; font-size: 15px;
+  padding: 15px 28px; border-radius: 14px;
+  text-decoration: none; border: 1px solid var(--border);
+  transition: all .2s;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: var(--bg3); }
+
+.install-note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+.install-note a { color: var(--accent); text-decoration: none; }
+
+/* Extension Preview */
+.hero-preview {
+  position: relative; display: inline-block; margin: 0 auto;
+}
+.preview-glow {
+  position: absolute; inset: -30px;
+  background: radial-gradient(circle at 50%, rgba(0,217,163,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.preview-card {
+  background: var(--bg2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 20px;
+  width: 320px;
+  text-align: left;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  position: relative;
+}
+.preview-status {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.status-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,217,163,0.2);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+.preview-status-text { font-size: 13px; font-weight: 600; color: var(--accent); }
+
+.preview-server {
+  background: var(--bg3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.preview-server-flag { font-size: 22px; }
+.preview-server-info { flex: 1; }
+.preview-server-name { font-size: 13px; font-weight: 600; }
+.preview-server-meta { font-size: 11px; color: var(--muted); }
+.preview-ping { font-size: 11px; font-weight: 700; color: var(--accent); }
+
+/* ── Stats ── */
+.stats {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 0 24px 80px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 36px; font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+.stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+/* ── Features ── */
+.section {
+  position: relative; z-index: 1;
+  max-width: 1160px; margin: 0 auto;
+  padding: 80px 24px;
+}
+.section-header { text-align: center; margin-bottom: 48px; }
+.section-tag {
+  display: inline-block;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--accent);
+  margin-bottom: 12px;
+}
+.section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -1px; }
+.section-sub { font-size: 16px; color: var(--muted); margin-top: 10px; }
+
+.features {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.feature {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 28px;
+  transition: border-color .2s, transform .2s;
+}
+.feature:hover { border-color: rgba(0,217,163,0.2); transform: translateY(-2px); }
+.feature-emoji { font-size: 32px; margin-bottom: 14px; }
+.feature-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ── Premium Section ── */
+.premium-section {
+  position: relative; z-index: 1;
+  padding: 80px 24px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.premium-inner {
+  max-width: 900px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+}
+.premium-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 12px; font-weight: 700; color: #FFD700;
+  margin-bottom: 16px;
+}
+.premium-title { font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px; }
+.premium-desc { font-size: 15px; color: var(--muted); margin-bottom: 24px; }
+.premium-steps { display: flex; flex-direction: column; gap: 14px; }
+.premium-step {
+  display: flex; align-items: center; gap: 14px;
+}
+.step-num {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.2));
+  border: 1px solid rgba(255,215,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: #FFD700;
+}
+.step-text { font-size: 14px; }
+.step-text strong { color: var(--text); }
+
+.premium-card {
+  background: var(--bg3);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 20px;
+  padding: 28px;
+}
+.plan { margin-bottom: 24px; }
+.plan-name { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 16px; }
+.plan-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.plan-item:last-child { border: none; }
+.check { color: var(--accent); }
+.cross { color: #444; }
+.lock { color: var(--muted); font-size: 12px; }
+
+/* ── Server Map ── */
+.servers-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;
+}
+.server-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color .15s;
+}
+.server-card:hover { border-color: rgba(0,217,163,0.2); }
+.server-card.premium-server { opacity: 0.7; }
+.server-flag { font-size: 24px; }
+.server-info .name { font-size: 13px; font-weight: 600; }
+.server-info .detail { font-size: 11px; color: var(--muted); }
+.server-badge {
+  margin-left: auto;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 7px; border-radius: 6px;
+  background: rgba(0,217,163,0.1);
+  color: var(--accent);
+  white-space: nowrap;
+}
+.server-badge.prem { background: rgba(255,215,0,0.1); color: #FFD700; }
+
+/* ── Install Steps ── */
+.install-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.install-step {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 24px; text-align: center;
+}
+.step-icon { font-size: 36px; margin-bottom: 14px; }
+.step-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.step-desc { font-size: 13px; color: var(--muted); }
+
+/* ── Ads / Partner Section ── */
+.ads-section {
+  position: relative; z-index: 1;
+  padding: 60px 24px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+.ads-inner { max-width: 1000px; margin: 0 auto; }
+.ads-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted);
+  text-align: center; margin-bottom: 28px;
+}
+/* ⚙️ РЕКЛАМА: добавляй новые карточки в #ad-cards */
+.ad-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.ad-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px;
+  text-decoration: none; color: var(--text);
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: all .2s;
+  position: relative; overflow: hidden;
+}
+.ad-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--ad-gradient, linear-gradient(135deg, rgba(0,217,163,0.05), transparent));
+  transition: opacity .2s; opacity: 0;
+}
+.ad-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+.ad-card:hover::before { opacity: 1; }
+.ad-icon { font-size: 32px; flex-shrink: 0; }
+.ad-info .ad-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.ad-info .ad-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.ad-tag {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  color: var(--muted);
+}
+
+/* ── FAQ Section ── */
+.faq-list { display: flex; flex-direction: column; gap: 8px; max-width: 720px; margin: 0 auto; }
+.faq-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+}
+.faq-q {
+  padding: 18px 20px; cursor: pointer;
+  font-weight: 600; font-size: 15px;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background .15s;
+}
+.faq-q:hover { background: var(--bg3); }
+.faq-a {
+  padding: 0 20px; max-height: 0; overflow: hidden;
+  transition: all .3s; font-size: 14px; color: var(--muted); line-height: 1.7;
+}
+.faq-item.open .faq-a { padding: 0 20px 18px; max-height: 200px; }
+.arrow { transition: transform .3s; }
+.faq-item.open .arrow { transform: rotate(180deg); }
+
+/* ── CTA ── */
+.cta-section {
+  position: relative; z-index: 1;
+  padding: 100px 24px;
+  text-align: center;
+}
+.cta-title { font-size: clamp(32px, 5vw, 56px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 16px; }
+.cta-title .grad {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* ── Footer ── */
+footer {
+  position: relative; z-index: 1;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 40px 24px;
+}
+.footer-inner {
+  max-width: 1160px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 20px;
+}
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-links a {
+  color: var(--muted); text-decoration: none; font-size: 13px;
+  transition: color .15s;
+}
+.footer-links a:hover { color: var(--text); }
+.footer-copy { font-size: 13px; color: var(--muted); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .premium-inner { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hero { padding: 60px 20px 40px; }
+  .preview-card { width: 100%; max-width: 320px; }
+}
+
+/* ── Toast Install ── */
+.install-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 24px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  z-index: 1000;
+  white-space: nowrap;
+  animation: slideUp .3s ease both;
+  display: none;
+}
+.install-toast.show { display: flex; }
+@keyframes slideUp { from{opacity:0;transform:translate(-50%,20px)} to{opacity:1;transform:translate(-50%,0)} }
+
+/* ── Scroll Animations ── */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s, transform .6s; }
+.reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="grid-overlay"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">⚡</div>
+      <div class="nav-logo-text">Flexi<span>VPN</span></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Возможности</a></li>
+      <li><a href="#servers">Серверы</a></li>
+      <li><a href="#premium">Premium</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="docs/index.html">Docs</a></li>
+    </ul>
+    <a href="#install" class="btn-nav" onclick="installExtension(event)">⚡ Установить бесплатно</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✨ Новый FlexiVPN 2026 — лучше, быстрее, мощнее</div>
+  <h1>VPN без<br><span class="grad">ограничений</span><br>в браузере</h1>
+  <p class="hero-sub">Бесплатный VPN для Chrome с обходом блокировок РФ, серверами в 10+ странах и Premium за активность — без карты и подписки.</p>
+
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="installExtension(event)">
+      ⚡ Установить FlexiVPN бесплатно
+    </button>
+    <a href="#features" class="btn-secondary">
+      📖 Узнать больше
+    </a>
+  </div>
+
+  <div class="hero-preview">
+    <div class="preview-glow"></div>
+    <div class="preview-card">
+      <div class="preview-status">
+        <div class="status-dot"></div>
+        <span class="preview-status-text">ПОДКЛЮЧЕНО</span>
+        <span style="margin-left:auto;font-size:12px;color:var(--muted)">NL · 45ms</span>
+      </div>
+      <div class="preview-server">
+        <div class="preview-server-flag">🇳🇱</div>
+        <div class="preview-server-info">
+          <div class="preview-server-name">Netherlands</div>
+          <div class="preview-server-meta">Amsterdam · SOCKS5</div>
+        </div>
+        <div class="preview-ping">45ms</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1;background:rgba(0,217,163,0.1);border:1px solid rgba(0,217,163,0.2);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">Загрузка</div>
+          <div style="font-size:13px;font-weight:700;color:var(--accent)">↓ 12 MB/s</div>
+        </div>
+        <div style="flex:1;background:rgba(123,95,255,0.1);border:1px solid rgba(123,95,255,0.2);border-radius:8px;padding:8px;text-align:center">
+          <div style="font-size:10px;color:var(--muted)">Отдача</div>
+          <div style="font-size:13px;font-weight:700;color:var(--accent2)">↑ 3 MB/s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="install-note" style="margin-top:24px">
+    Бесплатно · Без регистрации · Работает сразу после установки ·
+    <a href="docs/privacy.html">Без логов</a>
+  </p>
+</section>
+
+<!-- STATS -->
+<div class="stats reveal">
+  <div class="stat">
+    <div class="stat-num">10+</div>
+    <div class="stat-label">Стран серверов</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">60</div>
+    <div class="stat-label">Минут бесплатно</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">0₽</div>
+    <div class="stat-label">Без скрытых платежей</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section reveal" id="features">
+  <div class="section-header">
+    <div class="section-tag">Возможности</div>
+    <div class="section-title">Всё что нужно<br>от VPN-расширения</div>
+    <div class="section-sub">Никакой сложной настройки — работает из коробки</div>
+  </div>
+  <div class="features">
+    <div class="feature">
+      <div class="feature-emoji">⚡</div>
+      <div class="feature-title">Авто-выбор сервера</div>
+      <div class="feature-desc">Нажмите «Подключить» — FlexiVPN сам найдёт самый быстрый и стабильный сервер для вас.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-emoji">🇷🇺</div>
+      <div class="feature-title">Обход блокировок РФ</div>
+      <div class="feature-desc">Включите режим обхода — получите западный IP для YouTube, Discord и других сервисов.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-emoji">🔒</div>
+      <div class="feature-title">Без логов</div>
+      <div class="feature-desc">Мы не храним историю вашей активности. Данные остаются только на вашем устройстве.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-emoji">👑</div>
+      <div class="feature-title">Бесплатный Premium</div>
+      <div class="feature-desc">Заходи каждый день 14 дней — получи 7 дней Premium с неограниченными серверами.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-emoji">🔔</div>
+      <div class="feature-title">Push-уведомления</div>
+      <div class="feature-desc">Всегда знай что происходит — уведомления о подключении, отключении и времени сессии.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-emoji">🤖</div>
+      <div class="feature-title">Автообновление серверов</div>
+      <div class="feature-desc">Робот на GitHub Actions обновляет список серверов каждые 24 часа. Всегда свежие прокси.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVERS -->
+<section class="section reveal" id="servers" style="padding-top:0">
+  <div class="section-header">
+    <div class="section-tag">Серверы</div>
+    <div class="section-title">10+ локаций по всему миру</div>
+    <div class="section-sub">Бесплатные и Premium серверы — каждый день обновляются</div>
+  </div>
+  <div class="servers-grid">
+    <div class="server-card">
+      <span class="server-flag">🇳🇱</span>
+      <div class="server-info"><div class="name">Netherlands</div><div class="detail">Amsterdam · 45ms</div></div>
+      <span class="server-badge">Бесплатно</span>
+    </div>
+    <div class="server-card">
+      <span class="server-flag">🇩🇪</span>
+      <div class="server-info"><div class="name">Germany</div><div class="detail">Frankfurt · 38ms</div></div>
+      <span class="server-badge">Бесплатно</span>
+    </div>
+    <div class="server-card">
+      <span class="server-flag">🇸🇪</span>
+      <div class="server-info"><div class="name">Sweden</div><div class="detail">Stockholm · 62ms</div></div>
+      <span class="server-badge">Бесплатно</span>
+    </div>
+    <div class="server-card">
+      <span class="server-flag">🇫🇮</span>
+      <div class="server-info"><div class="name">Finland</div><div class="detail">Helsinki · 55ms</div></div>
+      <span class="server-badge">Бесплатно</span>
+    </div>
+    <div class="server-card premium-server">
+      <span class="server-flag">🇺🇸</span>
+      <div class="server-info"><div class="name">USA</div><div class="detail">New York · 90ms</div></div>
+      <span class="server-badge prem">👑 Premium</span>
+    </div>
+    <div class="server-card premium-server">
+      <span class="server-flag">🇫🇷</span>
+      <div class="server-info"><div class="name">France</div><div class="detail">Paris · 42ms</div></div>
+      <span class="server-badge prem">👑 Premium</span>
+    </div>
+    <div class="server-card premium-server">
+      <span class="server-flag">🇨🇭</span>
+      <div class="server-info"><div class="name">Switzerland</div><div class="detail">Zurich · 40ms</div></div>
+      <span class="server-badge prem">👑 Premium</span>
+    </div>
+    <div class="server-card premium-server">
+      <span class="server-flag">🇯🇵</span>
+      <div class="server-info"><div class="name">Japan</div><div class="detail">Tokyo · 180ms</div></div>
+      <span class="server-badge prem">👑 Premium</span>
+    </div>
+  </div>
+</section>
+
+<!-- PREMIUM -->
+<section class="premium-section reveal" id="premium">
+  <div class="premium-inner">
+    <div>
+      <div class="premium-badge">👑 Premium</div>
+      <div class="premium-title">Получи Premium<br>бесплатно</div>
+      <p class="premium-desc">Никаких платежей. Просто заходи в расширение каждый день — и через 14 дней получишь Premium на 7 дней автоматически.</p>
+      <div class="premium-steps">
+        <div class="premium-step">
+          <div class="step-num">1</div>
+          <div class="step-text">Установи расширение и <strong>заходи каждый день</strong></div>
+        </div>
+        <div class="premium-step">
+          <div class="step-num">14</div>
+          <div class="step-text">После 14 дней <strong>автоматически активируется</strong> Premium триал</div>
+        </div>
+        <div class="premium-step">
+          <div class="step-num">✨</div>
+          <div class="step-text"><strong>7 дней Premium</strong> — все серверы без ограничений</div>
+        </div>
+      </div>
+    </div>
+    <div class="premium-card">
+      <div class="plan">
+        <div class="plan-name">🆓 Бесплатно</div>
+        <div class="plan-item"><span class="check">✓</span> Серверы NL, DE, SE, FI</div>
+        <div class="plan-item"><span class="check">✓</span> Авто-выбор сервера</div>
+        <div class="plan-item"><span class="check">✓</span> Обход блокировок РФ</div>
+        <div class="plan-item"><span class="cross">—</span> Сессия 60 минут</div>
+        <div class="plan-item"><span class="cross">—</span> <span class="lock">🔒 US, FR, CH, JP серверы</span></div>
+      </div>
+      <div class="plan">
+        <div class="plan-name">👑 Premium</div>
+        <div class="plan-item"><span class="check">✓</span> Все 8+ серверов</div>
+        <div class="plan-item"><span class="check">✓</span> Без ограничений по времени</div>
+        <div class="plan-item"><span class="check">✓</span> Приоритетные серверы</div>
+        <div class="plan-item"><span class="check">✓</span> Premium-уведомления</div>
+        <div class="plan-item"><span class="check">✓</span> Ранний доступ к новым серверам</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO INSTALL -->
+<section class="section reveal" id="install">
+  <div class="section-header">
+    <div class="section-tag">Установка</div>
+    <div class="section-title">Три шага и готово</div>
+    <div class="section-sub">Расширение работает в Chrome, Chromium, Brave, Edge и других браузерах</div>
+  </div>
+  <div class="install-steps">
+    <div class="install-step">
+      <div class="step-icon">⬇️</div>
+      <div class="step-title">Скачать расширение</div>
+      <div class="step-desc">Нажмите кнопку «Установить» ниже или скачайте ZIP с GitHub</div>
+    </div>
+    <div class="install-step">
+      <div class="step-icon">🔧</div>
+      <div class="step-title">Распаковать и включить</div>
+      <div class="step-desc">Перейдите в chrome://extensions → Режим разработчика → Загрузить распакованное</div>
+    </div>
+    <div class="install-step">
+      <div class="step-icon">⚡</div>
+      <div class="step-title">Нажать подключить</div>
+      <div class="step-desc">Кликните на иконку FlexiVPN в панели браузера и нажмите «Подключить»</div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:36px">
+    <button class="btn-primary" style="font-size:16px;padding:17px 36px" onclick="installExtension(event)">
+      ⚡ Установить FlexiVPN
+    </button>
+    <p style="margin-top:12px;font-size:13px;color:var(--muted)">
+      Также доступно на
+      <a href="https://github.com/YOUR_USERNAME/flexivpn" style="color:var(--accent);text-decoration:none">GitHub</a>
+    </p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section reveal" id="faq" style="padding-top:0">
+  <div class="section-header">
+    <div class="section-tag">FAQ</div>
+    <div class="section-title">Частые вопросы</div>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Это действительно бесплатно? <span class="arrow">▼</span></div>
+      <div class="faq-a">Да, полностью бесплатно. Без карты, без регистрации, без скрытых платежей. Бесплатная сессия 60 минут, затем можно переподключиться.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">YouTube заработает? <span class="arrow">▼</span></div>
+      <div class="faq-a">Да! Включите «Обход блокировок РФ» в расширении — FlexiVPN выберет западный сервер, и YouTube будет работать как обычно.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Вы следите за моей активностью? <span class="arrow">▼</span></div>
+      <div class="faq-a">Нет. Мы не храним логи, не продаём данные. Все настройки хранятся только в вашем браузере локально.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Как работает Premium триал? <span class="arrow">▼</span></div>
+      <div class="faq-a">Просто заходи в расширение каждый день. После 14 дней подряд — автоматически активируется Premium на 7 дней. Никакой оплаты не нужно.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Работает ли FlexiVPN в других браузерах? <span class="arrow">▼</span></div>
+      <div class="faq-a">Да! FlexiVPN работает в Chrome, Brave, Edge, Vivaldi и любом Chromium-браузере. Для Firefox — отдельная версия в разработке.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ★ РЕКЛАМА ПАРТНЁРОВ ★
+  Добавляй новые рекламные карточки сюда.
+  Скопируй шаблон .ad-card и измени:
+  - href (ссылка)
+  - data-gradient (CSS градиент для hover-эффекта)
+  - .ad-icon (эмодзи)
+  - .ad-name (название)
+  - .ad-desc (описание)
+  - .ad-tag (метка)
+-->
+<section class="ads-section reveal">
+  <div class="ads-inner">
+    <div class="ads-label">🤝 От партнёров OinkTech</div>
+    <div class="ad-cards" id="ad-cards">
+
+      <!-- ПАРТНЁР 1: ProHub Nexus -->
+      <a href="https://prohub-nexus.lovable.app" target="_blank" class="ad-card"
+         style="--ad-gradient: linear-gradient(135deg, rgba(123,95,255,0.08), transparent)">
+        <div class="ad-icon">🏆</div>
+        <div class="ad-info">
+          <div class="ad-name">ProHub Nexus</div>
+          <div class="ad-desc">Профессиональное сообщество разработчиков. Форум, ресурсы и помощь.</div>
+        </div>
+        <span class="ad-tag">Форум</span>
+      </a>
+
+      <!-- ПАРТНЁР 2: FlexDev -->
+      <a href="https://flexdev.csamp.app" target="_blank" class="ad-card"
+         style="--ad-gradient: linear-gradient(135deg, rgba(0,217,163,0.08), transparent)">
+        <div class="ad-icon">⚙️</div>
+        <div class="ad-info">
+          <div class="ad-name">FlexDev</div>
+          <div class="ad-desc">Платформа для разработчиков от OinkTech. Инструменты, проекты, сообщество.</div>
+        </div>
+        <span class="ad-tag">Dev</span>
+      </a>
+
+      <!-- ШАБЛОН ДЛЯ НОВОЙ РЕКЛАМЫ — скопируй и заполни:
+      <a href="ССЫЛКА" target="_blank" class="ad-card"
+         style="--ad-gradient: linear-gradient(135deg, rgba(255,100,100,0.08), transparent)">
+        <div class="ad-icon">🔥</div>
+        <div class="ad-info">
+          <div class="ad-name">НАЗВАНИЕ</div>
+          <div class="ad-desc">ОПИСАНИЕ ПАРТНЁРА</div>
+        </div>
+        <span class="ad-tag">МЕТКА</span>
+      </a>
+      -->
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section reveal">
+  <div class="cta-title">Начни пользоваться<br><span class="grad">FlexiVPN прямо сейчас</span></div>
+  <p style="font-size:16px;color:var(--muted);margin-bottom:32px">Бесплатно · Без регистрации · Работает за 30 секунд</p>
+  <button class="btn-primary" style="font-size:16px;padding:18px 40px" onclick="installExtension(event)">
+    ⚡ Установить FlexiVPN бесплатно
+  </button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="/" class="nav-logo" style="text-decoration:none;color:var(--text)">
+      <div class="nav-logo-icon">⚡</div>
+      <div class="nav-logo-text">Flexi<span>VPN</span></div>
+    </a>
+    <div class="footer-links">
+      <a href="docs/faq.html">FAQ</a>
+      <a href="docs/docs.html">Docs</a>
+      <a href="docs/tos.html">Условия использования</a>
+      <a href="docs/privacy.html">Конфиденциальность</a>
+      <a href="https://github.com/YOUR_USERNAME/flexivpn" target="_blank">GitHub</a>
+    </div>
+    <div class="footer-copy">© 2026 OinkTech Ltd · FlexiVPN</div>
+  </div>
+</footer>
+
+<!-- Install Toast -->
+<div class="install-toast" id="installToast">
+  <span style="font-size:20px">✅</span>
+  <div>
+    <div style="font-weight:700;font-size:14px">Переходим на GitHub!</div>
+    <div style="font-size:12px;color:var(--muted)">Скачайте ZIP и загрузите в Chrome</div>
+  </div>
+  <button onclick="document.getElementById('installToast').classList.remove('show')"
+    style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;margin-left:8px">×</button>
+</div>
+
+<script>
+// ── Install Handler ──────────────────────────────────────────────────────────
+function installExtension(e) {
+  e.preventDefault();
+
+  // Check if Chrome extension API is available (browser with extension)
+  if (typeof chrome !== 'undefined' && chrome.webstore) {
+    // Chrome Web Store install (when published)
+    chrome.webstore.install(
+      'https://chrome.google.com/webstore/detail/EXTENSION_ID',
+      () => showToast('✅ FlexiVPN установлен!', 'Нажмите на иконку в панели браузера'),
+      (err) => fallbackInstall()
+    );
+  } else {
+    fallbackInstall();
+  }
+}
+
+function fallbackInstall() {
+  // Redirect to GitHub releases for manual install
+  const toast = document.getElementById('installToast');
+  toast.classList.add('show');
+  setTimeout(() => {
+    window.open('https://github.com/YOUR_USERNAME/flexivpn/releases/latest', '_blank');
+  }, 800);
+  setTimeout(() => toast.classList.remove('show'), 5000);
+}
+
+function showToast(title, desc) {
+  const t = document.getElementById('installToast');
+  t.querySelector('[style*="font-weight"]').textContent = title;
+  t.querySelector('[style*="12px"]').textContent = desc;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+// ── Scroll Reveal ────────────────────────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
