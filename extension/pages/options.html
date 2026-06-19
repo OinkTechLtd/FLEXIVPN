@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>FlexiVPN — Настройки</title>
+<style>
+:root{--bg:#0A0E1A;--bg2:#111828;--bg3:#1A2235;--border:rgba(255,255,255,0.08);--accent:#00D9A3;--text:#F0F4FF;--muted:#6B7FA3;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding:40px 24px;}
+.wrap{max-width:600px;margin:0 auto;}
+h1{font-size:24px;font-weight:700;margin-bottom:4px;}
+h1 span{color:var(--accent);}
+.sub{color:var(--muted);font-size:13px;margin-bottom:32px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:16px;}
+.row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.row:last-child{border-bottom:none;}
+.row-info .row-name{font-size:14px;font-weight:500;}
+.row-info .row-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+.toggle{position:relative;width:40px;height:22px;background:var(--bg3);border-radius:20px;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle.on::after{transform:translateX(18px);}
+.version{font-size:12px;color:var(--muted);text-align:center;margin-top:24px;}
+.btn{background:var(--accent);color:#000;font-weight:600;font-size:13px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;transition:all .2s;}
+.btn:hover{background:#00f5bc;}
+.btn-danger{background:#FF4D6D;color:#fff;}
+.btn-danger:hover{background:#ff6b84;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Flexi<span>VPN</span> — Настройки</h1>
+  <p class="sub">Управление расширением и предпочтениями</p>
+
+  <div class="card">
+    <div class="card-title">Соединение</div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Обход блокировок РФ</div>
+        <div class="row-desc">Западный IP для YouTube, Discord и других сервисов</div>
+      </div>
+      <div class="toggle" id="tBypass"></div>
+    </div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Уведомления</div>
+        <div class="row-desc">Push-уведомления о подключении и отключении</div>
+      </div>
+      <div class="toggle on" id="tNotify"></div>
+    </div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Автовыбор сервера</div>
+        <div class="row-desc">Автоматически выбирать лучший при подключении</div>
+      </div>
+      <div class="toggle on" id="tAutoSelect"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Статистика</div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Дней использования</div>
+      </div>
+      <span id="statDays" style="font-size:18px;font-weight:700;color:var(--accent)">–</span>
+    </div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Статус Premium</div>
+      </div>
+      <span id="statPremium" style="font-size:13px;">–</span>
+    </div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Серверов в базе</div>
+      </div>
+      <span id="statServers" style="font-size:13px;">–</span>
+    </div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Последнее обновление серверов</div>
+      </div>
+      <span id="statUpdate" style="font-size:12px;color:var(--muted);">–</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Данные</div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Сбросить данные</div>
+        <div class="row-desc">Удалить все настройки и статистику</div>
+      </div>
+      <button class="btn btn-danger" onclick="resetData()">Сбросить</button>
+    </div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-name">Обновить серверы</div>
+        <div class="row-desc">Загрузить свежий список серверов</div>
+      </div>
+      <button class="btn" onclick="refreshServers()">Обновить</button>
+    </div>
+  </div>
+
+  <div class="version" id="versionText">FlexiVPN v1.0.0 · OinkTech Ltd</div>
+</div>
+
+<script>
+async function loadState() {
+  const res = await new Promise(r => chrome.runtime.sendMessage({type:'GET_STATE'}, r));
+  const state = res.state || {};
+  const servers = res.servers || [];
+
+  document.getElementById('tBypass').className = 'toggle' + (state.bypassRF ? ' on' : '');
+  document.getElementById('statDays').textContent = state.totalDays || 0;
+  document.getElementById('statPremium').textContent = state.isPremium ? '👑 Активен' : '⛔ Нет';
+  document.getElementById('statServers').textContent = servers.length;
+  document.getElementById('statUpdate').textContent = state.lastServerUpdate
+    ? new Date(state.lastServerUpdate).toLocaleDateString('ru-RU')
+    : 'Никогда';
+  document.getElementById('versionText').textContent = `FlexiVPN v${chrome.runtime.getManifest().version} · OinkTech Ltd`;
+}
+
+document.getElementById('tBypass').onclick = () => {
+  chrome.runtime.sendMessage({type:'GET_STATE'}, res => {
+    const newVal = !res.state.bypassRF;
+    chrome.runtime.sendMessage({type:'SET_BYPASS_RF', value: newVal}, () => loadState());
+  });
+};
+
+function resetData() {
+  if (confirm('Все данные будут удалены. Продолжить?')) {
+    chrome.storage.local.clear(() => {
+      alert('Данные сброшены. Расширение вернулось к начальному состоянию.');
+      loadState();
+    });
+  }
+}
+
+function refreshServers() {
+  chrome.runtime.sendMessage({type:'FETCH_SERVERS'}, () => {
+    alert('Серверы обновлены!');
+    loadState();
+  });
+}
+
+loadState();
+</script>
+</body>
+</html>

@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=380, initial-scale=1.0">
+<title>FlexiVPN</title>
+<style>
+  :root {
+    --bg: #0A0E1A;
+    --bg2: #111828;
+    --bg3: #1A2235;
+    --border: rgba(255,255,255,0.08);
+    --accent: #00D9A3;
+    --accent2: #7B5FFF;
+    --danger: #FF4D6D;
+    --warning: #FFAA00;
+    --text: #F0F4FF;
+    --muted: #6B7FA3;
+    --premium: linear-gradient(135deg, #FFD700, #FF8C00);
+    --r: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    width: 380px;
+    min-height: 540px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo-text { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+  .logo-text span { color: var(--accent); }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .badge-premium {
+    background: var(--premium);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: none;
+  }
+  .badge-premium.active { display: block; }
+
+  .icon-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 4px; border-radius: 6px;
+    transition: color .2s, background .2s;
+    font-size: 16px;
+    display: flex; align-items: center;
+  }
+  .icon-btn:hover { color: var(--text); background: var(--bg3); }
+
+  /* ── Onboarding Screen ── */
+  #screen-onboarding {
+    padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .onboard-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .onboard-title span { color: var(--accent); }
+
+  .terms-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px;
+    height: 180px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .terms-box h4 { color: var(--text); margin-bottom: 6px; font-size: 13px; }
+  .terms-box p { margin-bottom: 8px; }
+
+  .terms-progress {
+    height: 3px;
+    background: var(--bg3);
+    border-radius: 10px;
+    margin-top: 8px;
+  }
+  .terms-progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 10px;
+    width: 0%;
+    transition: width .3s;
+  }
+  .terms-read-hint { font-size: 11px; color: var(--muted); text-align: right; margin-top: 4px; }
+
+  .checkbox-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    cursor: pointer;
+  }
+  .checkbox-row input[type=checkbox] { margin-top: 2px; accent-color: var(--accent); }
+  .checkbox-row label { font-size: 12px; color: var(--muted); cursor: pointer; }
+  .checkbox-row label a { color: var(--accent); text-decoration: none; }
+
+  /* ── Main Screen ── */
+  #screen-main { display: none; flex-direction: column; }
+
+  /* Status Card */
+  .status-card {
+    margin: 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .status-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity .5s;
+    pointer-events: none;
+  }
+  .status-card.connected::before {
+    background: radial-gradient(circle, rgba(0,217,163,0.15) 0%, transparent 70%);
+    opacity: 1;
+  }
+
+  .connect-btn {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    background: var(--bg3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    transition: all .3s;
+    position: relative;
+    outline: none;
+  }
+  .connect-btn:hover { transform: scale(1.04); }
+  .connect-btn.connected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 6px rgba(0,217,163,0.15), 0 0 30px rgba(0,217,163,0.3);
+  }
+  .connect-btn.connecting {
+    border-color: var(--warning);
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,170,0,0.3); }
+    50% { box-shadow: 0 0 0 12px rgba(255,170,0,0); }
+  }
+  .connect-btn svg { width: 36px; height: 36px; }
+
+  .status-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .status-label.connected { color: var(--accent); }
+  .status-label.connecting { color: var(--warning); }
+
+  .status-server { font-size: 15px; font-weight: 600; min-height: 20px; }
+  .status-meta { font-size: 12px; color: var(--muted); margin-top: 4px; min-height: 16px; }
+
+  /* Timer */
+  .timer-bar {
+    margin: 0 16px;
+    display: none;
+  }
+  .timer-bar.visible { display: block; }
+  .timer-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-bottom: 5px;
+  }
+  .timer-label span:last-child { color: var(--warning); font-weight: 600; }
+  .timer-track {
+    height: 4px; background: var(--bg3); border-radius: 10px; overflow: hidden;
+  }
+  .timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--warning));
+    border-radius: 10px;
+    width: 100%;
+    transition: width 1s linear;
+  }
+
+  /* Server Selector */
+  .section { padding: 0 16px; margin-bottom: 10px; }
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+
+  .server-list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 200px; overflow-y: auto;
+    padding-right: 2px;
+  }
+  .server-list::-webkit-scrollbar { width: 4px; }
+  .server-list::-webkit-scrollbar-track { background: var(--bg3); border-radius: 10px; }
+  .server-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  .server-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+  }
+  .server-item:hover { border-color: rgba(0,217,163,0.3); background: var(--bg3); }
+  .server-item.selected { border-color: var(--accent); }
+  .server-item.locked { opacity: 0.6; cursor: not-allowed; }
+
+  .server-flag { font-size: 18px; }
+  .server-info { flex: 1; min-width: 0; }
+  .server-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .server-detail { font-size: 11px; color: var(--muted); }
+
+  .server-ping {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 6px; border-radius: 6px;
+    background: var(--bg3);
+  }
+  .server-ping.good { color: var(--accent); }
+  .server-ping.ok { color: var(--warning); }
+  .server-ping.bad { color: var(--danger); }
+
+  .lock-icon { color: var(--warning); font-size: 13px; }
+
+  /* Auto-select row */
+  .auto-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(0,217,163,0.08), rgba(123,95,255,0.08));
+    border: 1px solid rgba(0,217,163,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s;
+    margin-bottom: 6px;
+  }
+  .auto-row:hover { border-color: var(--accent); }
+  .auto-row.selected { border-color: var(--accent); }
+  .auto-label { font-size: 13px; font-weight: 600; color: var(--accent); flex: 1; }
+  .auto-sub { font-size: 11px; color: var(--muted); }
+
+  /* Toggles */
+  .toggle-section { padding: 0 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .toggle-info { display: flex; align-items: center; gap: 8px; }
+  .toggle-icon { font-size: 16px; }
+  .toggle-name { font-size: 13px; font-weight: 500; }
+  .toggle-desc { font-size: 11px; color: var(--muted); }
+
+  .toggle {
+    position: relative; width: 36px; height: 20px;
+    background: var(--bg3); border-radius: 20px;
+    cursor: pointer; transition: background .2s;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: '';
+    position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    background: #fff; border-radius: 50%;
+    transition: transform .2s;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* Premium Banner */
+  .premium-banner {
+    margin: 0 16px 12px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,140,0,0.1));
+    border: 1px solid rgba(255,215,0,0.2);
+    border-radius: var(--r);
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; transition: border-color .2s;
+  }
+  .premium-banner:hover { border-color: rgba(255,215,0,0.4); }
+  .premium-banner-text { flex: 1; }
+  .premium-banner-title { font-size: 13px; font-weight: 600; color: #FFD700; }
+  .premium-banner-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .premium-active-banner {
+    background: linear-gradient(135deg, rgba(0,217,163,0.1), rgba(123,95,255,0.1));
+    border-color: rgba(0,217,163,0.2);
+  }
+  .premium-active-banner .premium-banner-title { color: var(--accent); }
+
+  /* Footer */
+  .popup-footer {
+    padding: 10px 16px 14px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-links { display: flex; gap: 12px; }
+  .footer-link {
+    font-size: 11px; color: var(--muted);
+    text-decoration: none; transition: color .15s;
+  }
+  .footer-link:hover { color: var(--text); }
+
+  /* Buttons */
+  .btn {
+    border: none; cursor: pointer; border-radius: 8px;
+    font-weight: 600; font-size: 13px; padding: 9px 16px;
+    transition: all .2s; outline: none;
+  }
+  .btn-accent { background: var(--accent); color: #000; }
+  .btn-accent:hover { background: #00f5bc; transform: translateY(-1px); }
+  .btn-accent:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: var(--bg3); color: var(--muted); }
+  .btn-ghost:hover { color: var(--text); }
+
+  .w-full { width: 100%; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">Flexi<span>VPN</span></div>
+  </div>
+  <div class="header-actions">
+    <div class="badge-premium" id="premiumBadge">Premium</div>
+    <button class="icon-btn" id="btnRefresh" title="Обновить серверы">🔄</button>
+    <button class="icon-btn" id="btnSettings" title="Настройки">⚙️</button>
+  </div>
+</div>
+
+<!-- ONBOARDING SCREEN -->
+<div id="screen-onboarding">
+  <div class="onboard-title">Добро пожаловать в <span>FlexiVPN</span> 👋</div>
+  <p style="font-size:12px;color:var(--muted);text-align:center">Перед началом прочтите и примите условия использования</p>
+
+  <div>
+    <div class="terms-box" id="termsBox">
+      <h4>Условия использования FlexiVPN</h4>
+      <p>FlexiVPN («Сервис») предоставляется OinkTech Ltd. Используя расширение, вы соглашаетесь с настоящими условиями в полном объёме.</p>
+      <h4>1. Использование Сервиса</h4>
+      <p>FlexiVPN предназначен исключительно для законных целей. Запрещается использование для: незаконной деятельности, нарушения авторских прав, спама, взлома систем или обхода законодательных ограничений вашей страны в незаконных целях.</p>
+      <h4>2. Бесплатная версия</h4>
+      <p>Бесплатная сессия составляет 60 минут. После истечения соединение автоматически прерывается. Некоторые серверы доступны только для Premium-пользователей.</p>
+      <h4>3. Premium подписка</h4>
+      <p>Пробный Premium на 7 дней разблокируется автоматически после 14 дней ежедневного использования расширения. Premium даёт доступ ко всем серверам без ограничений по времени.</p>
+      <h4>4. Конфиденциальность</h4>
+      <p>Мы не храним логи вашей активности. Мы не продаём ваши данные третьим лицам. Мы собираем только анонимную статистику использования для улучшения сервиса.</p>
+      <h4>5. Прокси и ответственность</h4>
+      <p>FlexiVPN использует публичные прокси-серверы. Мы не несём ответственности за их стабильность и скорость. Используйте сервис на свой страх и риск.</p>
+      <h4>6. Изменения условий</h4>
+      <p>Мы можем изменять условия в любое время. Продолжение использования означает согласие с новыми условиями.</p>
+      <h4>Политика конфиденциальности</h4>
+      <p>Мы используем минимально необходимые данные: статистика использования (анонимно), настройки расширения (локально). Данные не передаются третьим лицам. Вы можете удалить все данные, удалив расширение.</p>
+      <p style="margin-top:12px;color:#666">Последнее обновление: июнь 2026. OinkTech Ltd.</p>
+    </div>
+    <div class="terms-progress"><div class="terms-progress-bar" id="termsProgress"></div></div>
+    <div class="terms-read-hint" id="termsHint">📖 Прочтите до конца для продолжения</div>
+  </div>
+
+  <label class="checkbox-row">
+    <input type="checkbox" id="chkTerms" disabled>
+    <label for="chkTerms">Я прочитал(а) и принимаю <a href="#" onclick="openPage('tos')">Условия использования</a> и <a href="#" onclick="openPage('privacy')">Политику конфиденциальности</a></label>
+  </label>
+
+  <button class="btn btn-accent w-full" id="btnAccept" disabled>Принять и начать</button>
+</div>
+
+<!-- MAIN SCREEN -->
+<div id="screen-main">
+  <!-- Status Card -->
+  <div class="status-card" id="statusCard">
+    <button class="connect-btn" id="connectBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </button>
+    <div class="status-label" id="statusLabel">ОТКЛЮЧЕНО</div>
+    <div class="status-server" id="statusServer">Выберите сервер</div>
+    <div class="status-meta" id="statusMeta"></div>
+  </div>
+
+  <!-- Timer Bar (free users) -->
+  <div class="timer-bar" id="timerBar">
+    <div class="timer-label">
+      <span>⏱ Сессия</span>
+      <span id="timerText">60:00</span>
+    </div>
+    <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+  </div>
+
+  <!-- Premium Banner -->
+  <div class="premium-banner" id="premiumBanner">
+    <span style="font-size:20px">👑</span>
+    <div class="premium-banner-text">
+      <div class="premium-banner-title" id="premiumTitle">Разблокируй Premium</div>
+      <div class="premium-banner-sub" id="premiumSub">Заходи 14 дней подряд — получи 7 дней бесплатно</div>
+    </div>
+    <span style="font-size:16px;color:var(--muted)">›</span>
+  </div>
+
+  <!-- Server List -->
+  <div class="section">
+    <div class="section-label">Выбор сервера</div>
+    <div class="auto-row selected" id="autoRow" onclick="selectServer('auto')">
+      <span style="font-size:18px">⚡</span>
+      <div style="flex:1">
+        <div class="auto-label">Авто-выбор</div>
+        <div class="auto-sub">Лучший доступный сервер</div>
+      </div>
+      <span style="font-size:14px;color:var(--accent)">✓</span>
+    </div>
+    <div class="server-list" id="serverList">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- Toggles -->
+  <div class="toggle-section">
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="toggle-icon">🇷🇺</span>
+        <div>
+          <div class="toggle-name">Обход блокировок РФ</div>
+          <div class="toggle-desc">Западный IP — YouTube, Discord и др.</div>
+        </div>
+      </div>
+      <div class="toggle" id="toggleRF" onclick="toggleBypassRF()"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="popup-footer">
+    <div class="footer-links">
+      <a class="footer-link" href="#" onclick="openPage('faq')">FAQ</a>
+      <a class="footer-link" href="#" onclick="openPage('docs')">Docs</a>
+      <a class="footer-link" href="#" onclick="openPage('tos')">ToS</a>
+    </div>
+    <div style="font-size:11px;color:var(--muted)" id="streakInfo">📅 День 1</div>
+  </div>
+</div>
+
+<script>
+let state = {};
+let servers = [];
+let selectedServer = 'auto';
+let timerInterval = null;
+let termsRead = false;
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  const res = await sendMsg({ type: 'GET_STATE' });
+  state = res.state || {};
+  servers = res.servers || [];
+
+  if (!state.acceptedTerms) {
+    showScreen('onboarding');
+    initTermsScroll();
+  } else {
+    showScreen('main');
+    renderAll();
+  }
+}
+
+function showScreen(name) {
+  document.getElementById('screen-onboarding').style.display = name === 'onboarding' ? 'flex' : 'none';
+  document.getElementById('screen-main').style.display = name === 'main' ? 'flex' : 'none';
+}
+
+// ─── Terms Scroll Tracking ────────────────────────────────────────────────────
+function initTermsScroll() {
+  const box = document.getElementById('termsBox');
+  box.addEventListener('scroll', () => {
+    const pct = box.scrollTop / (box.scrollHeight - box.clientHeight);
+    const progress = Math.min(100, Math.round(pct * 100));
+    document.getElementById('termsProgress').style.width = progress + '%';
+    if (progress >= 95) {
+      termsRead = true;
+      document.getElementById('chkTerms').disabled = false;
+      document.getElementById('termsHint').textContent = '✅ Прочитано';
+      document.getElementById('termsHint').style.color = 'var(--accent)';
+    }
+  });
+
+  document.getElementById('chkTerms').addEventListener('change', (e) => {
+    document.getElementById('btnAccept').disabled = !e.target.checked;
+  });
+
+  document.getElementById('btnAccept').addEventListener('click', async () => {
+    await sendMsg({ type: 'ACCEPT_TERMS' });
+    state.acceptedTerms = true;
+    showScreen('main');
+    const res = await sendMsg({ type: 'GET_STATE' });
+    state = res.state;
+    servers = res.servers;
+    renderAll();
+  });
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderStatus();
+  renderServers();
+  renderPremium();
+  renderToggles();
+  renderStreak();
+  startTimer();
+}
+
+function renderStatus() {
+  const card = document.getElementById('statusCard');
+  const btn = document.getElementById('connectBtn');
+  const label = document.getElementById('statusLabel');
+  const server = document.getElementById('statusServer');
+  const meta = document.getElementById('statusMeta');
+
+  if (state.connected && state.currentServer) {
+    card.classList.add('connected');
+    btn.classList.add('connected');
+    label.textContent = 'ПОДКЛЮЧЕНО';
+    label.className = 'status-label connected';
+    server.textContent = state.currentServer.name;
+    meta.textContent = `${state.currentServer.city} · Пинг ${state.currentServer.ping}ms`;
+    btn.onclick = disconnectVPN;
+    btn.title = 'Отключиться';
+  } else {
+    card.classList.remove('connected');
+    btn.classList.remove('connected');
+    label.textContent = 'ОТКЛЮЧЕНО';
+    label.className = 'status-label';
+    server.textContent = 'Нажмите для подключения';
+    meta.textContent = '';
+    btn.onclick = connectVPN;
+    btn.title = 'Подключиться';
+  }
+}
+
+function renderServers() {
+  const list = document.getElementById('serverList');
+  const toShow = state.isPremium ? servers : servers;
+  list.innerHTML = '';
+
+  toShow.forEach(s => {
+    const locked = s.tier === 'premium' && !state.isPremium;
+    const pingClass = s.ping < 60 ? 'good' : s.ping < 120 ? 'ok' : 'bad';
+    const isSelected = selectedServer === s.id;
+
+    const el = document.createElement('div');
+    el.className = `server-item${locked ? ' locked' : ''}${isSelected ? ' selected' : ''}`;
+    el.innerHTML = `
+      <span class="server-flag">${getFlagEmoji(s.country)}</span>
+      <div class="server-info">
+        <div class="server-name">${s.name}</div>
+        <div class="server-detail">${s.city} · ${s.type}${locked ? ' · Premium' : ''}</div>
+      </div>
+      ${locked ? '<span class="lock-icon">🔒</span>' : `<span class="server-ping ${pingClass}">${s.ping}ms</span>`}
+    `;
+    if (!locked) el.onclick = () => selectServer(s.id);
+    list.appendChild(el);
+  });
+}
+
+function renderPremium() {
+  const banner = document.getElementById('premiumBanner');
+  const title = document.getElementById('premiumTitle');
+  const sub = document.getElementById('premiumSub');
+  const badge = document.getElementById('premiumBadge');
+
+  if (state.isPremium) {
+    banner.className = 'premium-banner premium-active-banner';
+    title.textContent = '👑 Premium активен';
+    const daysLeft = state.premiumExpiry ? Math.ceil((state.premiumExpiry - Date.now()) / 86400000) : '∞';
+    sub.textContent = `Осталось ${daysLeft} дней · Все серверы разблокированы`;
+    badge.classList.add('active');
+  } else {
+    const daysLeft = Math.max(0, 14 - (state.totalDays || 0));
+    title.textContent = '👑 Разблокируй Premium';
+    sub.textContent = daysLeft > 0
+      ? `Осталось ${daysLeft} дн. ежедневных входов для триала`
+      : 'Готово! Войдите завтра для активации';
+    badge.classList.remove('active');
+  }
+}
+
+function renderToggles() {
+  document.getElementById('toggleRF').className = 'toggle' + (state.bypassRF ? ' on' : '');
+}
+
+function renderStreak() {
+  document.getElementById('streakInfo').textContent = `📅 День ${state.totalDays || 1}`;
+}
+
+// ─── Timer ────────────────────────────────────────────────────────────────────
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  const bar = document.getElementById('timerBar');
+
+  if (state.connected && !state.isPremium && state.sessionEndTime) {
+    bar.classList.add('visible');
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+function updateTimer() {
+  const remaining = Math.max(0, state.sessionEndTime - Date.now());
+  const total = 60 * 60 * 1000;
+  const pct = (remaining / total) * 100;
+
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  document.getElementById('timerText').textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  document.getElementById('timerFill').style.width = pct + '%';
+
+  if (remaining <= 0) {
+    clearInterval(timerInterval);
+    state.connected = false;
+    renderAll();
+  }
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+async function connectVPN() {
+  const btn = document.getElementById('connectBtn');
+  btn.classList.add('connecting');
+  document.getElementById('statusLabel').textContent = 'ПОДКЛЮЧЕНИЕ...';
+  document.getElementById('statusLabel').className = 'status-label connecting';
+
+  const res = await sendMsg({ type: 'CONNECT', serverId: selectedServer });
+
+  if (res.success) {
+    const stateRes = await sendMsg({ type: 'GET_STATE' });
+    state = stateRes.state;
+    servers = stateRes.servers;
+  }
+
+  btn.classList.remove('connecting');
+  renderAll();
+}
+
+async function disconnectVPN() {
+  await sendMsg({ type: 'DISCONNECT' });
+  const res = await sendMsg({ type: 'GET_STATE' });
+  state = res.state;
+  if (timerInterval) clearInterval(timerInterval);
+  renderAll();
+}
+
+function selectServer(id) {
+  selectedServer = id;
+  document.querySelectorAll('.server-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById('autoRow').classList.remove('selected');
+
+  if (id === 'auto') {
+    document.getElementById('autoRow').classList.add('selected');
+  } else {
+    // Mark selected in list
+    renderServers();
+  }
+}
+
+async function toggleBypassRF() {
+  state.bypassRF = !state.bypassRF;
+  await sendMsg({ type: 'SET_BYPASS_RF', value: state.bypassRF });
+  renderToggles();
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function sendMsg(msg) {
+  return new Promise(resolve => chrome.runtime.sendMessage(msg, resolve));
+}
+
+function getFlagEmoji(countryCode) {
+  const flags = {
+    NL: '🇳🇱', DE: '🇩🇪', US: '🇺🇸', FI: '🇫🇮', FR: '🇫🇷',
+    JP: '🇯🇵', SE: '🇸🇪', CH: '🇨🇭', GB: '🇬🇧', CA: '🇨🇦',
+    SG: '🇸🇬', AU: '🇦🇺', BR: '🇧🇷', PL: '🇵🇱', UA: '🇺🇦',
+  };
+  return flags[countryCode] || '🌍';
+}
+
+function openPage(page) {
+  const urls = {
+    faq: '../docs/faq.html',
+    docs: '../docs/docs.html',
+    tos: '../docs/tos.html',
+    privacy: '../docs/privacy.html',
+  };
+  chrome.tabs.create({ url: chrome.runtime.getURL('pages/' + page + '.html') });
+}
+
+// ─── Button Handlers ──────────────────────────────────────────────────────────
+document.getElementById('btnRefresh').addEventListener('click', async () => {
+  document.getElementById('btnRefresh').style.animation = 'pulse 0.5s';
+  const res = await sendMsg({ type: 'FETCH_SERVERS' });
+  servers = res.servers || servers;
+  renderServers();
+  setTimeout(() => document.getElementById('btnRefresh').style.animation = '', 600);
+});
+
+document.getElementById('btnSettings').addEventListener('click', () => {
+  chrome.runtime.openOptionsPage();
+});
+
+// ─── Start ────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

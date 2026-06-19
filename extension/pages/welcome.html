@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Добро пожаловать в FlexiVPN</title>
+<style>
+  :root {
+    --bg: #0A0E1A;
+    --bg2: #111828;
+    --accent: #00D9A3;
+    --accent2: #7B5FFF;
+    --text: #F0F4FF;
+    --muted: #6B7FA3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 600px 400px at 20% 30%, rgba(0,217,163,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 500px at 80% 70%, rgba(123,95,255,0.08) 0%, transparent 70%);
+  }
+
+  .container {
+    text-align: center;
+    max-width: 560px;
+    padding: 40px 24px;
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 0.8s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .icon-wrap {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    margin: 0 auto 28px;
+    box-shadow: 0 0 60px rgba(0,217,163,0.3);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+  }
+  h1 span { color: var(--accent); }
+
+  .tagline {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 36px;
+    text-align: left;
+  }
+
+  .feature {
+    background: #111828;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .feature-icon { font-size: 24px; margin-bottom: 8px; }
+  .feature-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .feature-desc { font-size: 12px; color: var(--muted); }
+
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+    text-decoration: none;
+  }
+  .cta:hover { background: #00f5bc; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,217,163,0.3); }
+
+  .footer-note {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .footer-note a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="container">
+  <div class="icon-wrap">⚡</div>
+  <h1>Спасибо за установку <span>FlexiVPN</span>!</h1>
+  <p class="tagline">Мы рады приветствовать тебя! Теперь у тебя есть бесплатный VPN прямо в браузере. Безопасность, скорость и свобода — всё в одном клике.</p>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">🌍</div>
+      <div class="feature-title">Серверы по всему миру</div>
+      <div class="feature-desc">Нидерланды, Германия, США и другие страны</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Авто-выбор сервера</div>
+      <div class="feature-desc">Автоматически выбираем самый быстрый</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">Обход блокировок РФ</div>
+      <div class="feature-desc">YouTube, Discord и другие сервисы</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">👑</div>
+      <div class="feature-title">Бесплатный Premium</div>
+      <div class="feature-desc">Заходи 14 дней подряд — получи 7 дней Premium</div>
+    </div>
+  </div>
+
+  <button class="cta" onclick="window.close()">⚡ Начать использовать FlexiVPN</button>
+
+  <p class="footer-note">
+    Нажав на иконку расширения в браузере для начала •
+    <a href="https://flexivpn.vercel.app/docs/faq" target="_blank">FAQ</a> •
+    <a href="https://flexivpn.vercel.app" target="_blank">Сайт</a>
+  </p>
+</div>
+</body>
+</html>

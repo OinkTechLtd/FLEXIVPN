@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexiVPN — До свидания</title>
+<style>
+  :root { --bg:#0A0E1A; --accent:#00D9A3; --muted:#6B7FA3; --text:#F0F4FF; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+  }
+  .wrap { text-align:center; max-width:480px; padding:40px 24px; animation:in .8s both; }
+  @keyframes in { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+  .emoji { font-size:72px; margin-bottom:24px; display:block; animation:wave 1s ease-in-out; }
+  @keyframes wave { 0%,100%{transform:rotate(0)} 25%{transform:rotate(20deg)} 75%{transform:rotate(-20deg)} }
+  h1 { font-size:28px; font-weight:800; margin-bottom:12px; }
+  h1 span { color:var(--accent); }
+  p { color:var(--muted); line-height:1.6; margin-bottom:20px; }
+  .reason { margin:24px 0; }
+  .reason p { margin-bottom:12px; font-weight:500; color:var(--text); }
+  .reasons { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .r {
+    background:#111828; border:1px solid rgba(255,255,255,0.07);
+    border-radius:10px; padding:10px 12px;
+    font-size:13px; cursor:pointer; transition:border-color .15s;
+  }
+  .r:hover, .r.selected { border-color:var(--accent); }
+  .btn {
+    display:inline-block; background:var(--accent); color:#000;
+    font-weight:700; font-size:14px; padding:12px 24px;
+    border-radius:10px; text-decoration:none; margin:6px;
+    transition:all .2s;
+  }
+  .btn:hover { background:#00f5bc; transform:translateY(-1px); }
+  .btn-ghost {
+    display:inline-block; color:var(--muted); font-size:13px;
+    text-decoration:none; margin-top:16px;
+  }
+  .btn-ghost:hover { color:var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="emoji">😢</span>
+  <h1>Ты нас <span>покидаешь?</span></h1>
+  <p>Жаль видеть тебя уходящим. FlexiVPN старался защитить тебя в сети, но мы понимаем, что у всех разные потребности.</p>
+
+  <div class="reason">
+    <p>Можешь сказать, почему удаляешь?</p>
+    <div class="reasons">
+      <div class="r" onclick="this.classList.toggle('selected')">🐢 Медленные серверы</div>
+      <div class="r" onclick="this.classList.toggle('selected')">🔧 Технические проблемы</div>
+      <div class="r" onclick="this.classList.toggle('selected')">💰 Нужен Premium</div>
+      <div class="r" onclick="this.classList.toggle('selected')">🔄 Перехожу на другой VPN</div>
+      <div class="r" onclick="this.classList.toggle('selected')">🚫 VPN мне не нужен</div>
+      <div class="r" onclick="this.classList.toggle('selected')">❓ Другая причина</div>
+    </div>
+  </div>
+
+  <p>Если у тебя возникли проблемы — мы всегда готовы помочь. Напиши нам до удаления!</p>
+
+  <div>
+    <a href="https://flexivpn.vercel.app" class="btn">🏠 Вернуться на сайт</a>
+    <a href="mailto:support@oinktech.ru" class="btn">✉️ Написать в поддержку</a>
+  </div>
+  <br>
+  <a href="#" class="btn-ghost">Оставить отзыв в Chrome Web Store</a>
+</div>
+
+<script>
+// Detect uninstall - this page is set as uninstall URL
+if (document.referrer.includes('chrome-extension://')) {
+  document.querySelector('h1').innerHTML = 'Ты нас <span>покидаешь?</span>';
+}
+</script>
+</body>
+</html>

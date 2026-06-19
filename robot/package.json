@@ -1,0 +1,14 @@
+{
+  "name": "flexivpn-robot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "FlexiVPN daily server collector robot",
+  "scripts": {
+    "collect": "node collect.js",
+    "verify": "node verify.js",
+    "run": "node collect.js && node verify.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
