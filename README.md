@@ -199,8 +199,4 @@ MIT © 2026 OinkTech Ltd
 
 ---
 
-## 🤝 Контакты
 
-- **Email:** support@oinktech.ru
-- **GitHub:** [@YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-- **Сайт:** [flexivpn.vercel.app](https://flexivpn.vercel.app)
