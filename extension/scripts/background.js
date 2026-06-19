@@ -1,7 +1,7 @@
 // FlexiVPN Background Service Worker
 // Handles: proxy, timers, notifications, premium logic, server updates
 
-const SERVERS_URL = 'https://flexivpn.tatnet.app/servers.json';
+const SERVERS_URL = 'https://raw.githubusercontent.com/OinkTechLtd/FLEXIVPN/main/servers.json';
 const FREE_SESSION_MINUTES = 60;
 const PREMIUM_UNLOCK_DAYS = 14;
 const PREMIUM_TRIAL_DAYS = 7;
